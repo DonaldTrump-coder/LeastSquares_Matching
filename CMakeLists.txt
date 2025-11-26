@@ -1,7 +1,7 @@
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 cmake_minimum_required(VERSION 3.12)
 project(LEASTSQUARES_MATCHING)
 
-# ----------------- 编译选项 -----------------
 set(CMAKE_CXX_STANDARD 14)
 
 if(MINGW)
@@ -12,22 +12,17 @@ endif()
 if(WIN32)
     set(PARALLEL_JOBS "")
 else()
-    set(PARALLEL_JOBS "-- -j8")   # Linux 使用 8 线程
+    set(PARALLEL_JOBS "-- -j8")
 endif()
 
-# ----------------- OpenCV 安装目录 -----------------
-# 在项目内部安装 OpenCV
 set(OPENCV_INSTALL_DIR "${CMAKE_BINARY_DIR}/opencv_install")
 set(OpenCV_DIR "${OPENCV_INSTALL_DIR}")
 
-# ----------------- 检测 OpenCV 是否已经安装 -----------------
 if(NOT EXISTS "${OPENCV_INSTALL_DIR}/OpenCVConfig.cmake")
     message(STATUS "OpenCV not found, building from source...")
 
-    # 设置 OpenCV 构建目录
     set(OPENCV_BUILD_DIR "${CMAKE_BINARY_DIR}/opencv_build")
 
-    # 添加 OpenCV 源码子目录并编译（只在第一次执行）
     execute_process(
     COMMAND ${CMAKE_COMMAND} -S ${CMAKE_SOURCE_DIR}/third_party/src/opencv
             -B ${OPENCV_BUILD_DIR}
@@ -54,19 +49,17 @@ if(NOT EXISTS "${OPENCV_INSTALL_DIR}/OpenCVConfig.cmake")
     endif()
 endif()
 
-# ----------------- 查找 OpenCV -----------------
 find_package(OpenCV REQUIRED)
 
-# ----------------- 创建可执行文件 -----------------
 add_executable(leastsquares_matching
     core/src/matching.cpp
     core/src/test.cpp
+    core/src/matrix.cpp
+    core/src/tools.cpp
 )
 
-# ----------------- 链接 OpenCV -----------------
 target_link_libraries(leastsquares_matching PRIVATE ${OpenCV_LIBS})
 
-# ----------------- 项目头文件 -----------------
 target_include_directories(leastsquares_matching PRIVATE
     ${CMAKE_SOURCE_DIR}/core/include
 )
