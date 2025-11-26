@@ -10,9 +10,11 @@ class matching
     cv::Mat left_window;
     cv::Mat right_window;
     int W,H;
+    int leftx, lefty, rightx, righty;
 
     public:
     matching(std::string left_path, std::string right_path);
     void set_params(int window_size);
-    void choose_centers(int left_x, int left_y, int right_x, int right_y); //construct windows
+    void set_centers(int left_x, int left_y, int right_x, int right_y); //construct windows
+    void disp_windows();
 };

@@ -63,3 +63,20 @@ target_link_libraries(leastsquares_matching PRIVATE ${OpenCV_LIBS})
 target_include_directories(leastsquares_matching PRIVATE
     ${CMAKE_SOURCE_DIR}/core/include
 )
+
+if(WIN32)
+    foreach(lib ${OpenCV_LIBS})
+        get_target_property(lib_path ${lib} LOCATION)
+        add_custom_command(TARGET leastsquares_matching POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${lib_path}" $<TARGET_FILE_DIR:leastsquares_matching>
+        )
+    endforeach()
+endif()
+
+if(UNIX AND NOT APPLE)
+    set_target_properties(leastsquares_matching PROPERTIES
+        BUILD_RPATH "${OpenCV_LIB_DIR}"
+        INSTALL_RPATH "${OpenCV_LIB_DIR}"
+    )
+endif()

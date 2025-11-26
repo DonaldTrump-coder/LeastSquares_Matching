@@ -15,8 +15,12 @@ void matching::set_params(int size = 15)
     right_window = cv::Mat::zeros(window_size, window_size, CV_8UC1);
 }
 
-void matching::choose_centers(int left_x, int left_y, int right_x, int right_y)
+void matching::set_centers(int left_x, int left_y, int right_x, int right_y)
 {
+    leftx = left_x;
+    lefty = left_y;
+    rightx = right_x;
+    righty = right_y; //record the centers
     int k = window_size/2;
     for(int i = -k; i<k+1; i++) //x
     {
@@ -26,4 +30,11 @@ void matching::choose_centers(int left_x, int left_y, int right_x, int right_y)
             right_window.at<uchar>(j+k, i+k) = right_img.at<uchar>(right_y+j, right_x+i);
         }
     }
+}
+
+void matching::disp_windows()
+{
+    cv::imshow("Left",left_window);
+    cv::imshow("Right",right_window);
+    cv::waitKey(0);
 }
