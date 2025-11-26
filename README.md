@@ -1,4 +1,5 @@
-mkdir build
-cd build
-cmake .. -G "MinGW Makefiles"
-mingw32-make -j8
+mkdir build<br>
+cd build<br>
+cmake .. -G "MinGW Makefiles"<br>
+mingw32-make -j8<br>
+.\leastsquares_matching.exe
