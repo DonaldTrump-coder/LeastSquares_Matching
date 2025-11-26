@@ -19,3 +19,6 @@ double sec_abs(double sec);
 
 //弧度转换为度分秒
 double rad2dms(double rad);
+
+template<typename T>
+T clamp(T val, T lo, T hi);
