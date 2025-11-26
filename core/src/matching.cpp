@@ -8,7 +8,7 @@ matching::matching(std::string left_path, std::string right_path)
     H = right_img.rows;
 }
 
-void matching::set_params(int size)
+void matching::set_params(int size = 15)
 {
     window_size = size;
     left_window = cv::Mat::zeros(window_size, window_size, CV_8UC1);
