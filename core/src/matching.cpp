@@ -11,8 +11,10 @@ matching::matching(std::string left_path, std::string right_path)
 void matching::set_params(int size = 15)
 {
     window_size = size;
-    left_window = cv::Mat::zeros(window_size, window_size, CV_8UC1);
-    right_window = cv::Mat::zeros(window_size, window_size, CV_8UC1);
+    left_window = cv::Mat::zeros(window_size, window_size, CV_32F);
+    right_window = cv::Mat::zeros(window_size, window_size, CV_32F);
+    g2_dx = cv::Mat::zeros(window_size-2, window_size-2, CV_32F);
+    g2_dy = cv::Mat::zeros(window_size-2, window_size-2, CV_32F);
 }
 
 void matching::set_centers(int left_x, int left_y, int right_x, int right_y)
@@ -21,13 +23,13 @@ void matching::set_centers(int left_x, int left_y, int right_x, int right_y)
     lefty = left_y;
     rightx = right_x;
     righty = right_y; //record the centers
-    int k = window_size/2;
+    int k = (int)(window_size/2);
     for(int i = -k; i<k+1; i++) //x
     {
         for(int j = -k; j<k+1;j++) //y
         {
-            left_window.at<uchar>(j+k, i+k) = left_img.at<uchar>(left_y+j, left_x+i);
-            right_window.at<uchar>(j+k, i+k) = right_img.at<uchar>(right_y+j, right_x+i);
+            left_window.at<float>(j+k, i+k) = left_img.at<uchar>(left_y+j, left_x+i);
+            right_window.at<float>(j+k, i+k) = right_img.at<uchar>(right_y+j, right_x+i);
         }
     }
 }
@@ -55,7 +57,7 @@ void matching::params_init()
     L = Matrix((window_size-2)*(window_size-2), 1);
 }
 
-uchar matching::sample_img(cv::Mat img, double x, double y)
+float matching::sample_img(cv::Mat img, double x, double y)
 {
     int width = img.cols;
     int height = img.rows;
@@ -88,7 +90,7 @@ uchar matching::sample_img(cv::Mat img, double x, double y)
                I10 * dx * (1 - dy) +
                I01 * (1 - dx) * dy +
                I11 * dx * dy;
-    return static_cast<uchar>(clamp(I, 0.0, 255.0));
+    return static_cast<float>(clamp(I, 0.0, 255.0));
 }
 
 void matching::get_g2()
@@ -99,7 +101,7 @@ void matching::get_g2()
     double b0 = X.getMatrix_ele(5,0);
     double b1 = X.getMatrix_ele(6,0);
     double b2 = X.getMatrix_ele(7,0);
-    int k = window_size/2;
+    int k = (int)(window_size/2);
     for(int i = -k; i<k+1; i++)
     {
         for(int j = -k; j<k+1;j++)
@@ -108,7 +110,7 @@ void matching::get_g2()
             int y = righty + j; //变形前的像素点坐标
             double x2 = a0 + a1*x + a2*y;
             double y2 = b0 + b1*x + b2*y; //变形后的像素点坐标
-            right_window.at<uchar>(j+k, i+k) = sample_img(right_img, x2, y2);
+            right_window.at<float>(j+k, i+k) = sample_img(right_img, x2, y2);
         }
     }
     g2 = right_window.clone();
@@ -119,19 +121,55 @@ void matching::radioCorrection()
     double h0 = X.getMatrix_ele(0,0);
     double h1 = X.getMatrix_ele(1,0);
 
-    int k = window_size/2;
+    int k = (int)(window_size/2);
     for(int i = -k; i<k+1; i++)
     {
         for(int j = -k; j<k+1;j++)
         {
-            uchar val = right_window.at<uchar>(j+k, i+k);
+            float val = right_window.at<float>(j+k, i+k);
             double corrected = h0 + h1 * val;
-            right_window.at<uchar>(j+k, i+k) = static_cast<uchar>(clamp(corrected, 0.0, 255.0));
+            right_window.at<float>(j+k, i+k) = static_cast<float>(clamp(corrected, 0.0, 255.0));
         }
     }
 }
 
 void matching::get_dg()
 {
-    
+    for(int i = 0; i<window_size-2; i++)
+    {
+        for(int j = 0;j<window_size-2;j++)
+        {
+            g2_dx.at<float>(j,i) = 0.5*(g2.at<float>(j+1,i+2)-g2.at<float>(j+1,i));
+            g2_dy.at<float>(j,i) = 0.5*(g2.at<float>(j+2,i+1)-g2.at<float>(j,i+1));
+        }
+    }
+}
+
+void matching::construct_matrices()
+{
+    double h1 = X.getMatrix_ele(1,0);
+    int pix_counter = 0;
+    int k = (int)((window_size-2)/2);
+    for(int i = 0;i<window_size-2; i++)
+    {
+        for(int j = 0;j<window_size-2; j++)
+        {
+            int x = rightx - k + i;
+            int y = righty - k + j;
+            B.SetMatrix_ele(pix_counter, 0, 1);
+            B.SetMatrix_ele(pix_counter, 1, g2.at<float>(j+1, i+1));
+
+            B.SetMatrix_ele(pix_counter, 2, h1*g2_dx.at<float>(j,i));
+            B.SetMatrix_ele(pix_counter, 3, h1*x*g2_dx.at<float>(j,i));
+            B.SetMatrix_ele(pix_counter, 4, h1*y*g2_dx.at<float>(j,i));
+
+            B.SetMatrix_ele(pix_counter, 5, h1*g2_dy.at<float>(j,i));
+            B.SetMatrix_ele(pix_counter, 6, h1*x*g2_dy.at<float>(j,i));
+            B.SetMatrix_ele(pix_counter, 7, h1*y*g2_dy.at<float>(j,i));
+
+            float dl = left_window.at<float>(j+1, i+1) - right_window.at<float>(j+1, i+1);
+            L.SetMatrix_ele(pix_counter, 0, dl);
+            pix_counter++;
+        }
+    }
 }

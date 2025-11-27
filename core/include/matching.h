@@ -28,7 +28,8 @@ class matching
     void disp_windows();
     void params_init();
     void get_g2(); //right window 重采样
-    uchar sample_img(cv::Mat img, double x, double y);
+    float sample_img(cv::Mat img, double x, double y);
     void radioCorrection();
     void get_dg(); //对g2求导
+    void construct_matrices(); //构造系数矩阵
 };
