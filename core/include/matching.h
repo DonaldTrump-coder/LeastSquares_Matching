@@ -11,12 +11,14 @@ class matching
     int window_size = 15;
     cv::Mat left_window;
     cv::Mat right_window;
+    cv::Mat left_window_centered;
     int W,H;
     int leftx, lefty, rightx, righty;
     Matrix X; //参数值
     Matrix B;
     Matrix L;
     Matrix x; //改正数
+    Matrix v; //残差
 
     cv::Mat g2;
     cv::Mat g2_dx, g2_dy;
@@ -25,6 +27,14 @@ class matching
     double d_corr;
     bool first = 1;
     bool stop = 0;
+    double delta0, deltag, deltag_, deltax;
+    double SNR;
+    double rho;
+
+    double min_x_left;
+    double min_y_left;
+    double min_x_right;
+    double min_y_right;
 
     public:
     matching(std::string left_path, std::string right_path);
@@ -32,6 +42,7 @@ class matching
     void set_centers(int left_x, int left_y, int right_x, int right_y); //construct windows
     void disp_windows();
     void params_init();
+    void centerize();
     void get_g2(); //right window 重采样
     float sample_img(cv::Mat img, double x, double y);
     void radioCorrection();
@@ -41,4 +52,5 @@ class matching
     void update();
     void get_corr();
     void calculate();
+    void precision();
 };

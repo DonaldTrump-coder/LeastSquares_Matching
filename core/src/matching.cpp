@@ -212,6 +212,17 @@ void matching::update()
     double new_b1 = b1 + a1*db1 + b1*db2;
     double new_b2 = b2 + a2*db1 + b2*db2;
 
+    /*
+    double new_h0 = h0 + dh0;
+    double new_h1 = h1 + dh1;
+    double new_a0 = a0 + da0;
+    double new_a1 = a1 + da1;
+    double new_a2 = a2 + da2;
+    double new_b0 = b0 + db0;
+    double new_b1 = b1 + db1;
+    double new_b2 = b2 + db2;
+    */
+
     X.SetMatrix_ele(0,0,new_h0);
     X.SetMatrix_ele(1,0,new_h1);
     X.SetMatrix_ele(2,0,new_a0);
@@ -265,6 +276,79 @@ void matching::get_corr()
     }
 }
 
+void matching::centerize()
+{
+    left_window.convertTo(left_window_centered, CV_32F);
+    cv::Scalar meanVal = cv::mean(left_img);
+    float meanGray = static_cast<float>(meanVal[0]);
+
+    left_window_centered = left_window_centered - meanGray;
+}
+
+void matching::precision()
+{
+    double a0 = X.getMatrix_ele(2,0);
+    double a1 = X.getMatrix_ele(3,0);
+    double a2 = X.getMatrix_ele(4,0);
+    double b0 = X.getMatrix_ele(5,0);
+    double b1 = X.getMatrix_ele(6,0);
+    double b2 = X.getMatrix_ele(7,0);
+    double h0 = X.getMatrix_ele(0,0);
+    double h1 = X.getMatrix_ele(1,0);
+    v = B * x - L;
+    delta0 = std::sqrt((v.trans()*v).getMatrix_ele(0,0)/((window_size-2)*(window_size-2)-8));
+    deltag = 0;
+    centerize();
+    deltag_ = 0;
+    for(int i = 0; i<window_size-2;i++)
+    {
+        for(int j = 0;j<window_size-2;j++)
+        {
+            double g = left_window_centered.at<float>(j+1,i+1);
+            deltag += g*g;
+
+            double dx = g2_dx.at<float>(j,i);
+            double dy = g2_dy.at<float>(j,i);
+            deltag_ += dx*dx + dy*dy;
+        }
+    }
+    deltag = std::sqrt(deltag/((window_size-2)*(window_size-2)-8));
+    deltag_ = std::sqrt(deltag_/((window_size-2)*(window_size-2)-8));
+    SNR = deltag / delta0;
+    rho = std::sqrt(1-1/(SNR*SNR));
+    deltax = std::sqrt((delta0*delta0)/(deltag_*deltag_*(window_size-2)*(window_size-2)));
+
+    double new_rightx = a0 + rightx*a1 + righty * a2;
+    double new_righty = b0 + rightx*b1 + righty * b2;
+    int k = (int)((window_size-2)/2);
+    int pix_counter = 0;
+    double v_min = v.getMatrix_ele(0,0);
+    min_x_left = leftx - k;
+    min_y_left = lefty - k;
+    min_x_right = rightx - k;
+    min_y_right = righty - k;
+    for(int i=-k;i<k+1;i++)
+    {
+        for(int j=-k;j<k+1;j++)
+        {
+            double v_present = v.getMatrix_ele(pix_counter,0);
+            if(v_present<v_min)
+            {
+                v_min = v_present;
+                min_x_left = leftx + i;
+                min_y_left = lefty + j;
+                min_x_right = rightx + i;
+                min_y_right = righty + j;
+            }
+            pix_counter++;
+        }
+    }
+    double new_min_x_right = a0 + min_x_right*a1 + min_y_right * a2;
+    double new_min_y_right = b0 + min_x_right*b1 + min_y_right * b2;
+    min_x_right = new_min_x_right;
+    min_y_right = new_min_y_right;
+}
+
 void matching::calculate()
 {
     params_init();
@@ -279,7 +363,7 @@ void matching::calculate()
         else
         {
             get_corr();
-            if(dabs(d_corr)<0.15)
+            if(dabs(d_corr)<0.02)
             {
                 stop = 1;
             }
@@ -293,5 +377,9 @@ void matching::calculate()
             break;
         }
     }
-    X.print();
+    get_g2();
+    radioCorrection();
+    get_dg();
+    construct_matrices();
+    precision();
 }
