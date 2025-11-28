@@ -9,5 +9,6 @@ int main()
     match.set_params(45);
     match.set_centers(2061,1408,1547,1408);
     match.calculate();
+    match.get_result();
     return 0;
 }

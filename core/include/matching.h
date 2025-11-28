@@ -14,6 +14,7 @@ class matching
     cv::Mat left_window_centered;
     int W,H;
     int leftx, lefty, rightx, righty;
+    double new_rightx, new_righty;
     Matrix X; //参数值
     Matrix B;
     Matrix L;
@@ -22,6 +23,7 @@ class matching
 
     cv::Mat g2;
     cv::Mat g2_dx, g2_dy;
+    cv::Mat distortion_window;
 
     double corr;
     double d_corr;
@@ -53,4 +55,5 @@ class matching
     void get_corr();
     void calculate();
     void precision();
+    void get_result();
 };

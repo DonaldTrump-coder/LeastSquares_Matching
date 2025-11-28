@@ -318,8 +318,8 @@ void matching::precision()
     rho = std::sqrt(1-1/(SNR*SNR));
     deltax = std::sqrt((delta0*delta0)/(deltag_*deltag_*(window_size-2)*(window_size-2)));
 
-    double new_rightx = a0 + rightx*a1 + righty * a2;
-    double new_righty = b0 + rightx*b1 + righty * b2;
+    new_rightx = a0 + rightx*a1 + righty * a2;
+    new_righty = b0 + rightx*b1 + righty * b2;
     int k = (int)((window_size-2)/2);
     int pix_counter = 0;
     double v_min = v.getMatrix_ele(0,0);
@@ -332,7 +332,7 @@ void matching::precision()
         for(int j=-k;j<k+1;j++)
         {
             double v_present = v.getMatrix_ele(pix_counter,0);
-            if(v_present<v_min)
+            if(dabs(v_present)<dabs(v_min))
             {
                 v_min = v_present;
                 min_x_left = leftx + i;
@@ -382,4 +382,37 @@ void matching::calculate()
     get_dg();
     construct_matrices();
     precision();
+}
+
+void matching::get_result()
+{
+    double a0 = X.getMatrix_ele(2,0);
+    double a1 = X.getMatrix_ele(3,0);
+    double a2 = X.getMatrix_ele(4,0);
+    double b0 = X.getMatrix_ele(5,0);
+    double b1 = X.getMatrix_ele(6,0);
+    double b2 = X.getMatrix_ele(7,0);
+    double h0 = X.getMatrix_ele(0,0);
+    double h1 = X.getMatrix_ele(1,0);
+    distortion_window = cv::Mat(left_window.size(), CV_32F, cv::Scalar(0.0f));
+    int k = (int)(window_size/2);
+    for(int i = -k; i<k+1; i++)
+    {
+        for(int j = -k; j<k+1;j++)
+        {
+            int x = rightx + i;
+            int y = righty + j; //变形前的像素点坐标
+            double x2 = a0 + a1*x + a2*y;
+            double y2 = b0 + b1*x + b2*y; //变形后的像素点坐标
+            if(x2 < rightx - k || x2 > rightx + k || y2 < righty - k || y2 > righty + k)
+            {
+                continue;
+            }
+            distortion_window.at<float>(std::round(x2 - rightx + k), std::round(y2 - righty + k)) = sample_img(right_img, x2, y2);
+        }
+    }
+    cv::Mat right_win_show;
+    cv::normalize(distortion_window, right_win_show, 0, 1, cv::NORM_MINMAX);
+    cv::imshow("Distortion",right_win_show);
+    cv::waitKey(0);
 }
