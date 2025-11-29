@@ -16,11 +16,13 @@ You also need to make sure its path `Cmake\bin` is a member of the environment v
 In CMD, enter `cmake --version`, if you get the version of CMake, the installation is finished.<br><br>
 **3. Build for the Code**<br>
 In the project directory, run the following commands:<br>
-`mkdir build`<br>
-`cd build`<br>
-`cmake .. -G "MinGW Makefiles"`<br>
-`mingw32-make -j8`<br>
-`.\leastsquares_matching.exe`<br>
+```
+mkdir build
+cd build
+cmake .. -G "MinGW Makefiles"
+mingw32-make -j8
+.\leastsquares_matching.exe
+```
 The output is from the main function in `core\src\test.cpp`
 
 ## Image Matching Application Deployment
