@@ -55,5 +55,6 @@ class matching
     void get_corr();
     void calculate();
     void precision();
+    cv::Mat get_left_window();
     void get_result();
 };

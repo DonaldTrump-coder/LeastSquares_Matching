@@ -1,20 +1,22 @@
 #include "matching.h"
 
-matching::matching(std::string left_path, std::string right_path)
+matching::matching(std::string left_path, //左影像路径
+                std::string right_path //右影像路径
+                )
 {
-    left_img = cv::imread(left_path, cv::IMREAD_GRAYSCALE);
-    right_img = cv::imread(right_path, cv::IMREAD_GRAYSCALE);
-    W = left_img.cols;
-    H = right_img.rows;
+    left_img = cv::imread(left_path, cv::IMREAD_GRAYSCALE); //读取左影像
+    right_img = cv::imread(right_path, cv::IMREAD_GRAYSCALE); //读取右影像
+    W = left_img.cols; //影像宽度
+    H = right_img.rows; //影像高度
 }
 
 void matching::set_params(int size = 15)
 {
-    window_size = size;
+    window_size = size; //传入平差窗口大小
     left_window = cv::Mat::zeros(window_size, window_size, CV_32F);
     right_window = cv::Mat::zeros(window_size, window_size, CV_32F);
     g2_dx = cv::Mat::zeros(window_size-2, window_size-2, CV_32F);
-    g2_dy = cv::Mat::zeros(window_size-2, window_size-2, CV_32F);
+    g2_dy = cv::Mat::zeros(window_size-2, window_size-2, CV_32F); //初始化变量：左右影像窗口和左右窗口差分值
 }
 
 void matching::set_centers(int left_x, int left_y, int right_x, int right_y)
@@ -34,14 +36,14 @@ void matching::set_centers(int left_x, int left_y, int right_x, int right_y)
     }
 }
 
-void matching::disp_windows()
+void matching::disp_windows() //展示影像窗口
 {
     cv::Mat left_win_show;
     cv::Mat right_win_show;
     cv::normalize(left_window, left_win_show, 0, 1, cv::NORM_MINMAX);
-    cv::normalize(right_window, right_win_show, 0, 1, cv::NORM_MINMAX);
+    cv::normalize(right_window, right_win_show, 0, 1, cv::NORM_MINMAX); //影像窗口用了32位浮点数存储，因此在显示时要归一化至0-1之间再显示
     cv::imshow("Left",left_win_show);
-    cv::imshow("Right",right_win_show);
+    cv::imshow("Right",right_win_show); //展示图像
     cv::waitKey(0);
 }
 
@@ -415,4 +417,9 @@ void matching::get_result()
     cv::normalize(distortion_window, right_win_show, 0, 1, cv::NORM_MINMAX);
     cv::imshow("Distortion",right_win_show);
     cv::waitKey(0);
+}
+
+cv::Mat matching::get_left_window()
+{
+    return left_window.clone();
 }
