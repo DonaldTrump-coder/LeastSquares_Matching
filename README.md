@@ -40,7 +40,7 @@ pip install -r requirements.txt
 ```
 cd python
 python setup.py bdist_wheel
-pip install dist\lsmatching-0.0.1-cp311-cp311-win_amd64.whl
+pip install dist\lsmatching-0.0.1-cp311-cp311-win_amd64.whl --force-reinstall
 cd ..
 ```
 Then the install of C++ Source of Least-Square Matching is done.<br><br>

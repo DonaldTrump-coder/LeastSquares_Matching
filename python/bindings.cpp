@@ -44,7 +44,7 @@ py::array mat_to_numpy(const cv::Mat &mat)
     }
 }
 
-PYBIND11_MODULE(lsmatching, m)
+PYBIND11_MODULE(_lsmatching, m)
 {
     m.doc() = "Least squares matching module";
     py::class_<matching>(m, "Matching")

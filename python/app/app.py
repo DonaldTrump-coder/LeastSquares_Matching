@@ -1,8 +1,9 @@
-from python.ui import Matching_ui as UI
+from python.app.ui import Matching_ui as UI
 from PyQt5.QtWidgets import QApplication, QSplashScreen, QFileDialog, QMessageBox
 import sys
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
+import lsmatching
 
 def show_info(parent, title="提示", message="操作成功"):
     msg_box = QMessageBox(parent)

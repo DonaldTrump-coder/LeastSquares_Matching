@@ -59,5 +59,4 @@ class ClickableImageLabel(QLabel):
             x_img = x_in_pix * self.pixmap_orig.width() / scaled_pix.width()
             y_img = y_in_pix * self.pixmap_orig.height() / scaled_pix.height()
             self.click_point = (x_img, y_img) # 每次点击覆盖
-            print(f"点击位置（图像像素坐标）：({int(x_img)}, {int(y_img)})")
             self.update_display()
