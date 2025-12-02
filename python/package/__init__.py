@@ -28,3 +28,21 @@ class Matching:
 
     def get_matched_y(self) -> float:
         return self.matching.get_matched_y()
+    
+    def get_delta0(self) -> float:
+        return self.matching.get_delta0()
+    
+    def get_SNR(self) -> float:
+        return self.matching.get_SNR()
+    
+    def get_rho(self) -> float:
+        return self.matching.get_rho()
+    
+    def get_deltag(self) -> float:
+        return self.matching.get_deltag()
+    
+    def get_deltag_(self) -> float:
+        return self.matching.get_deltag_()
+    
+    def get_deltax(self) -> float:
+        return self.matching.get_deltax()

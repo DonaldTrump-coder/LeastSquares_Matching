@@ -448,3 +448,33 @@ double matching::get_matched_y()
 {
     return new_righty;
 }
+
+double matching::get_delta0()
+{
+    return delta0;
+}
+
+double matching::get_SNR()
+{
+    return SNR;
+}
+    
+double matching::get_rho()
+{
+    return rho;
+}
+
+double matching::get_deltag()
+{
+    return deltag;
+}
+    
+double matching::get_deltag_()
+{
+    return deltag_;
+}
+    
+double matching::get_deltax()
+{
+    return deltax;
+}

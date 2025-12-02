@@ -61,4 +61,10 @@ class matching
     void get_matched_points(std::string savepath);
     double get_matched_y();
     double get_matched_x();
+    double get_delta0();
+    double get_SNR();
+    double get_rho();
+    double get_deltag();
+    double get_deltag_();
+    double get_deltax();
 };

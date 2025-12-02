@@ -61,5 +61,11 @@ PYBIND11_MODULE(_lsmatching, m)
         .def("get_matched_points", &matching::get_matched_points)
         .def("get_matched_x", &matching::get_matched_x)
         .def("get_matched_y", &matching::get_matched_y)
+        .def("get_delta0", &matching::get_delta0)
+        .def("get_SNR", &matching::get_SNR)
+        .def("get_rho", &matching::get_rho)
+        .def("get_deltag", &matching::get_deltag)
+        .def("get_deltag_", &matching::get_deltag_)
+        .def("get_deltax", &matching::get_deltax)
         ;
 }

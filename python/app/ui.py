@@ -145,6 +145,15 @@ class Matching_ui(QMainWindow):
         self.right_window_label = QLabel("右窗口纠正图")
         self.right_window = Window_Label()
 
+        self.text_result_widget = QWidget(self)
+        self.text_result_widget.raise_()
+        text_result_layout = QGridLayout()
+        self.text_result_widget.setLayout(text_result_layout)
+        self.text_result_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        self.me_label = QLabel("单位权中误差: ")
+        self.me = QLabel()
+
         result_layout.addWidget(self.left_window_origin_label, 0, 0, alignment=Qt.AlignCenter)
         result_layout.addWidget(self.left_window_origin, 1, 0, alignment=Qt.AlignCenter)
         result_layout.addWidget(self.right_window_origin_label, 0, 1, alignment=Qt.AlignCenter)
@@ -159,6 +168,9 @@ class Matching_ui(QMainWindow):
         result_layout.addWidget(self.left_window, 4, 0, alignment=Qt.AlignCenter)
         result_layout.addWidget(self.right_window_label, 3, 1, alignment=Qt.AlignCenter)
         result_layout.addWidget(self.right_window, 4, 1, alignment=Qt.AlignCenter)
+
+        text_result_layout.addWidget(self.me_label, 0, 0, alignment=Qt.AlignCenter)
+        text_result_layout.addWidget(self.me, 0, 1, alignment=Qt.AlignCenter)
 
         main_layout.addWidget(wrapper, alignment=Qt.AlignHCenter)
 
@@ -221,6 +233,13 @@ class Matching_ui(QMainWindow):
 
         self.blankwidget1.setFixedHeight(int(self.width()*0.008))
         self.blankwidget2.setFixedHeight(int(self.width()*0.008))
+
+        self.text_result_widget.move(int(self.width()*0.15), int(self.height()*0.59))
+        self.text_result_widget.setFixedSize(int(self.width()*0.18), int(self.height()*0.35))
+        self.me_label.setFixedHeight(int(self.width()*0.02))
+        self.me_label.setStyleSheet(f"font-size:{int(self.width()*0.012)}px;")
+        self.me.setFixedHeight(int(self.width()*0.02))
+        self.me.setStyleSheet(f"font-family: Consolas; font-size:{int(self.width()*0.010)}px;")
 
     def update_label_font(self):
         for label in [self.left_img, self.right_img]:

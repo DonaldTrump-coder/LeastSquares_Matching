@@ -105,6 +105,8 @@ class matching_app:
         self.ui.left_window.set_image(left_window_matched)
         self.ui.right_window.set_image(right_window_matched)
 
+        self.ui.me.setText(f"{matching.get_delta0():.6f}")
+
     def matching_cal(self):
         matching = Matching(self.left_img_path, self.right_img_path)
         matching.set_params(35)
