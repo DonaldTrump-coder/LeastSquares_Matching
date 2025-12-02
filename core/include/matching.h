@@ -27,6 +27,7 @@ class matching
 
     double corr;
     double d_corr;
+    double d_corr_thres = 0.04;
     bool first = 1;
     bool stop = 0;
     double delta0, deltag, deltag_, deltax;
@@ -38,9 +39,13 @@ class matching
     double min_x_right;
     double min_y_right;
 
+    int matching_window_size;
+    double ncc_threshold;
+
     public:
     matching(std::string left_path, std::string right_path);
-    void set_params(int window_size);
+    void set_params(int window_size, double threshold);
+    void set_matching_params(int matching_window_size, double ncc_threshold);
     void set_centers(int left_x, int left_y, int right_x, int right_y); //construct windows
     void disp_windows();
     void params_init();
@@ -67,4 +72,12 @@ class matching
     double get_deltag();
     double get_deltag_();
     double get_deltax();
+    double get_h0();
+    double get_h1();
+    double get_a0();
+    double get_a1();
+    double get_a2();
+    double get_b0();
+    double get_b1();
+    double get_b2();
 };

@@ -19,5 +19,5 @@ public:
 
 	cv::Mat matOperator(char op, cv::Mat&);
 	void saveResult(const std::string& savepath);
-	void Calculate(cv::Mat& LefImg, cv::Mat& RigImg);
+	void Calculate(cv::Mat& LefImg, cv::Mat& RigImg, int WINDOWSIZE, double NCC_THRESHOLD);
 };

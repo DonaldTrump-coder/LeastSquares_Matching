@@ -20,6 +20,14 @@ class matching_app:
     right_img_path = None
     left_points = None
     right_points = None
+    h0 = None
+    h1 = None
+    a0 = None
+    a1 = None
+    a2 = None
+    b0 = None
+    b1 = None
+    b2 = None
 
     def __init__(self):
         self.app = QApplication(sys.argv)
@@ -31,6 +39,7 @@ class matching_app:
         self.ui.choose_btn.clicked.connect(self.choose_cal)
         self.ui.matching_btn.clicked.connect(self.matching_cal)
         self.ui.output_btn.clicked.connect(self.matching_output)
+        self.ui.param_btn.clicked.connect(self.check_params)
 
     def get_points(self):
         left_path = os.path.join(self.working_directory, "Left_result.dat")
@@ -92,7 +101,11 @@ class matching_app:
         matching = Matching(self.left_img_path, self.right_img_path)
         x1, y1 = self.ui.left_img.click_point
         x2, y2 = self.ui.right_img.click_point
-        matching.set_params(35)
+        windowsize_text = self.ui.windowsize_line_edit.text()
+        ncc_thres_text = self.ui.d_ncc_line_edit.text()
+        windowsize = int(windowsize_text) if windowsize_text else 15
+        ncc_value = float(ncc_thres_text) if ncc_thres_text else 0.04
+        matching.set_params(windowsize, ncc_value)
         matching.set_centers(x1, y1, x2, y2)
         left_window = matching.get_left_window()
         right_window = matching.get_right_window()
@@ -106,10 +119,49 @@ class matching_app:
         self.ui.right_window.set_image(right_window_matched)
 
         self.ui.me.setText(f"{matching.get_delta0():.6f}")
+        self.ui.SNR.setText(f"{matching.get_SNR():.6f}")
+        self.ui.rho.setText(f"{matching.get_rho():.6f}")
+        self.ui.texture.setText(f"{matching.get_deltag_()/matching.get_deltag():.6f}")
+        self.ui.deltax.setText(f"{matching.get_deltax():.6f}")
+
+        self.ui.x1.setText(f"x={int(self.ui.left_img.click_point[0])}")
+        self.ui.y1.setText(f"y={int(self.ui.left_img.click_point[1])}")
+        self.ui.x2.setText(f"x={int(self.ui.right_img.click_point[0])}")
+        self.ui.y2.setText(f"y={int(self.ui.right_img.click_point[1])}")
+        self.ui.x3.setText(f"x={int(self.ui.left_img.click_point[0])}")
+        self.ui.y3.setText(f"y={int(self.ui.left_img.click_point[1])}")
+        self.ui.x4.setText(f"x={matching.get_matched_x():.6f}")
+        self.ui.y4.setText(f"y={matching.get_matched_y():.6f}")
+        
+        self.h0 = matching.get_h0()
+        self.h1 = matching.get_h1()
+        self.a0 = matching.get_a0()
+        self.a1 = matching.get_a1()
+        self.a2 = matching.get_a2()
+        self.b0 = matching.get_b0()
+        self.b1 = matching.get_b1()
+        self.b2 = matching.get_b2()
+
+    def check_params(self):
+        show_info(self.ui, "查看参数", f"h0 = {self.h0:.6f}, h1 = {self.h1:.6f}, a0 = {self.a0:.6f}, a1 = {self.a1:.6f}, a2 = {self.a2:.6f}, b0 = {self.b0:.6f}, b1 = {self.b1:.6f}, b2 = {self.b2:.6f}")
 
     def matching_cal(self):
         matching = Matching(self.left_img_path, self.right_img_path)
-        matching.set_params(35)
+
+        windowsize_text = self.ui.windowsize_line_edit.text()
+        ncc_thres_text = self.ui.d_ncc_line_edit.text()
+        windowsize = int(windowsize_text) if windowsize_text else 15
+        ncc_value = float(ncc_thres_text) if ncc_thres_text else 0.04
+        matching.set_params(windowsize, ncc_value)
+        windowsize_text = None
+        ncc_thres_text = None
+
+        windowsize_text = self.ui.windowsize_line_edit2.text()
+        ncc_thres_text = self.ui.ncc_line_edit2.text()
+        windowsize = int(windowsize_text) if windowsize_text else 3
+        ncc_value = float(ncc_thres_text) if ncc_thres_text else 0.7
+        matching.set_matching_params(windowsize, ncc_value)
+
         matching.get_matched_points(self.working_directory)
         self.get_points()
         for index, _ in enumerate(self.left_points):

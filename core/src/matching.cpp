@@ -11,9 +11,10 @@ matching::matching(std::string left_path, //左影像路径
     H = right_img.rows; //影像高度
 }
 
-void matching::set_params(int size = 15)
+void matching::set_params(int size = 15, double threshold = 0.04)
 {
     window_size = size; //传入平差窗口大小
+    d_corr_thres = threshold;
     left_window = cv::Mat::zeros(window_size, window_size, CV_32F);
     right_window = cv::Mat::zeros(window_size, window_size, CV_32F);
     g2_dx = cv::Mat::zeros(window_size-2, window_size-2, CV_32F);
@@ -315,11 +316,11 @@ void matching::precision()
             deltag_ += dx*dx + dy*dy;
         }
     }
-    deltag = std::sqrt(deltag/((window_size-2)*(window_size-2)-8));
-    deltag_ = std::sqrt(deltag_/((window_size-2)*(window_size-2)-8));
+    deltag = std::sqrt(deltag/((window_size-2)*(window_size-2)));
+    deltag_ = std::sqrt(deltag_/((window_size-2)*(window_size-2)));
     SNR = deltag / delta0;
     rho = std::sqrt(1-1/(SNR*SNR));
-    deltax = std::sqrt((delta0*delta0)/(deltag_*deltag_*(window_size-2)*(window_size-2)));
+    deltax = std::sqrt(((1-rho*rho)*deltag*deltag)/((window_size-2)*(window_size-2)*deltag_*deltag_));
 
     new_rightx = a0 + rightx*a1 + righty * a2;
     new_righty = b0 + rightx*b1 + righty * b2;
@@ -367,7 +368,7 @@ void matching::calculate()
         else
         {
             get_corr();
-            if(dabs(d_corr)<0.02)
+            if(dabs(d_corr) < d_corr_thres)
             {
                 stop = 1;
             }
@@ -435,8 +436,14 @@ cv::Mat matching::get_right_window()
 void matching::get_matched_points(std::string savepath)
 {
     CorrelationMatch match;
-    match.Calculate(left_img, right_img);
+    match.Calculate(left_img, right_img, matching_window_size, ncc_threshold);
     match.saveResult(savepath);
+}
+
+void matching::set_matching_params(int window_size, double threshold)
+{
+    matching_window_size = window_size;
+    ncc_threshold = threshold;
 }
 
 double matching::get_matched_x()
@@ -477,4 +484,44 @@ double matching::get_deltag_()
 double matching::get_deltax()
 {
     return deltax;
+}
+
+double matching::get_h0()
+{
+    return X.getMatrix_ele(0,0);
+}
+
+double matching::get_h1()
+{
+    return X.getMatrix_ele(1,0);
+}
+    
+double matching::get_a0()
+{
+    return X.getMatrix_ele(2,0);
+}
+    
+double matching::get_a1()
+{
+    return X.getMatrix_ele(3,0);
+}
+    
+double matching::get_a2()
+{
+    return X.getMatrix_ele(4,0);
+}
+    
+double matching::get_b0()
+{
+    return X.getMatrix_ele(5,0);
+}
+    
+double matching::get_b1()
+{
+    return X.getMatrix_ele(6,0);
+}
+    
+double matching::get_b2()
+{
+    return X.getMatrix_ele(7,0);
 }

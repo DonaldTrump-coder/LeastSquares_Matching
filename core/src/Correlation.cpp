@@ -6,8 +6,8 @@
 #include "Extract.h"
 #include <fstream>
 
-const double NCC_THRESHOLD = 0.7;
-const int WINDOWSIZE = 3;
+//const double NCC_THRESHOLD = 0.7;
+//const int WINDOWSIZE = 3;
 const int SEARCHSIZE = 520;
 const char POINTFEATUREMETHOD = 'M';
 
@@ -21,7 +21,7 @@ cv::Mat CorrelationMatch::matOperator(char op, cv::Mat& img) {
 	}
 }
 
-void CorrelationMatch::Calculate(cv::Mat& LefImg, cv::Mat& RigImg) {
+void CorrelationMatch::Calculate(cv::Mat& LefImg, cv::Mat& RigImg, int WINDOWSIZE, double NCC_THRESHOLD) {
 	Mat LefPoint = matOperator(POINTFEATUREMETHOD, LefImg);
 
 	for (int i = WINDOWSIZE / 2; i < LefImg.rows - WINDOWSIZE / 2; i++) {
