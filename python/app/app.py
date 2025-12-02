@@ -4,6 +4,7 @@ import sys
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 from lsmatching import Matching
+import os
 
 def show_info(parent, title="提示", message="操作成功"):
     msg_box = QMessageBox(parent)
@@ -17,6 +18,8 @@ class matching_app:
     working_directory = None
     left_img_path = None
     right_img_path = None
+    left_points = None
+    right_points = None
 
     def __init__(self):
         self.app = QApplication(sys.argv)
@@ -27,6 +30,26 @@ class matching_app:
         self.ui.right_btn.clicked.connect(self.get_right_image)
         self.ui.choose_btn.clicked.connect(self.choose_cal)
         self.ui.matching_btn.clicked.connect(self.matching_cal)
+        self.ui.output_btn.clicked.connect(self.matching_output)
+
+    def get_points(self):
+        left_path = os.path.join(self.working_directory, "Left_result.dat")
+        right_path = os.path.join(self.working_directory, "Right_result.dat")
+        self.left_points = []
+        self.right_points = []
+        self.right_points_corrected = []
+        with open(left_path, 'r') as file:
+            for line in file:
+                line = line.strip()
+                if line:
+                    x, y = line.split('\t')
+                    self.left_points.append((int(x), int(y)))
+        with open(right_path, 'r') as file:
+            for line in file:
+                line = line.strip()
+                if line:
+                    x, y = line.split('\t')
+                    self.right_points.append((int(x), int(y)))
 
     def set_directory(self):
         folder = QFileDialog.getExistingDirectory(self.ui, "选择工作空间")
@@ -84,7 +107,21 @@ class matching_app:
 
     def matching_cal(self):
         matching = Matching(self.left_img_path, self.right_img_path)
+        matching.set_params(35)
         matching.get_matched_points(self.working_directory)
+        self.get_points()
+        for index, _ in enumerate(self.left_points):
+            x1, y1 = self.left_points[index]
+            x2, y2 = self.right_points[index]
+            matching.set_centers(x1, y1, x2, y2)
+            matching.calculate()
+            self.right_points_corrected.append((matching.get_matched_x(), matching.get_matched_y()))
+
+    def matching_output(self):
+        corrected_y_path = os.path.join(self.working_directory, "Right_result_corrected.dat")
+        with open(corrected_y_path, 'w') as file:
+            for (x, y) in self.right_points_corrected:
+                file.write(f"{x}\t{y}\n")
     
     def run(self):
         sys.exit(self.app.exec_())

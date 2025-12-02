@@ -22,3 +22,9 @@ class Matching:
     
     def get_matched_points(self, savepath: str):
         self.matching.get_matched_points(savepath)
+
+    def get_matched_x(self) -> float:
+        return self.matching.get_matched_x()
+
+    def get_matched_y(self) -> float:
+        return self.matching.get_matched_y()

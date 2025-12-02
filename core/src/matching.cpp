@@ -355,6 +355,7 @@ void matching::precision()
 void matching::calculate()
 {
     params_init();
+    int times = 0;
     while(1)
     {
         get_g2();
@@ -375,7 +376,8 @@ void matching::calculate()
         construct_matrices();
         adjustment();
         update();
-        if(stop == 1)
+        times++;
+        if(stop == 1 || times > 20)
         {
             break;
         }
