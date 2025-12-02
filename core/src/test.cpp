@@ -6,7 +6,7 @@ int main()
     std::string left_path = "C:/Users/10527/Desktop/shuzisheyingceliang/LeastSquares_Matching/img/uavl_epi.jpg";
     std::string right_path = "C:/Users/10527/Desktop/shuzisheyingceliang/LeastSquares_Matching/img/uavr_epi.jpg";
     matching match(left_path, right_path);
-    match.set_params(45);
+    match.set_params(45, 0.001);
     match.set_centers(2061,1408,1547,1408);
     match.calculate();
     match.get_result();
