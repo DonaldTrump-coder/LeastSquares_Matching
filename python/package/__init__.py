@@ -15,4 +15,4 @@ class Matching:
         self.matching.calculate()
 
     def get_left_window(self) -> np.ndarray:
-        return self._matching.get_left_window()
+        return self.matching.get_left_window()

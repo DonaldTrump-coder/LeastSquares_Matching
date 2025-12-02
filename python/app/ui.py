@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import QMainWindow, QPushButton, QLabel, QWidget, QVBoxLayout, QDesktopWidget, QHBoxLayout, QSizePolicy, QLineEdit
+from PyQt5.QtWidgets import QMainWindow, QPushButton, QLabel, QWidget, QVBoxLayout, QDesktopWidget, QHBoxLayout, QSizePolicy, QLineEdit, QGridLayout
 from PyQt5.QtCore import Qt
-from python.app.ImageLabel import ClickableImageLabel
+from python.app.ImageLabel import ClickableImageLabel, Window_Label
 
 class Matching_ui(QMainWindow):
     def __init__(self):
@@ -14,7 +14,7 @@ class Matching_ui(QMainWindow):
 
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
-        main_layout = QVBoxLayout()
+        main_layout = QHBoxLayout()
         central_widget.setLayout(main_layout)
 
         img_layout = QHBoxLayout()
@@ -125,6 +125,23 @@ class Matching_ui(QMainWindow):
         wrapper_layout.addWidget(self.choosing_widget, alignment=Qt.AlignHCenter)
         wrapper_layout.addWidget(self.matching_widget, alignment = Qt.AlignHCenter)
 
+        self.result_widget = QWidget(self)
+        self.result_widget.setStyleSheet("border: 3px solid red;")
+        self.result_widget.raise_()
+        result_layout = QGridLayout()
+        self.result_widget.setLayout(result_layout)
+        self.result_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        self.left_window_origin_label = QLabel("左窗口原图")
+        self.left_window_origin = Window_Label()
+        self.right_window_origin_label = QLabel("右窗口原图")
+        self.right_window_origin = Window_Label()
+
+        result_layout.addWidget(self.left_window_origin_label, 0, 0)
+        result_layout.addWidget(self.left_window_origin, 1, 0)
+        result_layout.addWidget(self.right_window_origin_label, 0, 1)
+        result_layout.addWidget(self.right_window_origin, 1, 1)
+
         main_layout.addWidget(wrapper, alignment=Qt.AlignHCenter)
 
     def resizeEvent(self, event):
@@ -160,6 +177,9 @@ class Matching_ui(QMainWindow):
         self.windowsize_label2.setStyleSheet(f"font-size:{int(self.height() * 0.02)}px;")
         self.windowsize_line_edit2.setFixedHeight(int(self.height() * 0.02)+1)
         self.windowsize_line_edit2.setStyleSheet(f"font-size:{int(self.height() * 0.02)}px;")
+
+        self.result_widget.move(int(self.width()*0.65), int(self.height()*0.7))
+        self.result_widget.setFixedSize(int(self.width()*0.2), int(self.height()*0.2))
 
     def update_label_font(self):
         for label in [self.left_img, self.right_img]:

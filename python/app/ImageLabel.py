@@ -1,6 +1,7 @@
-from PyQt5.QtWidgets import QLabel
-from PyQt5.QtGui import QPixmap, QPainter, QPen
+from PyQt5.QtWidgets import QLabel, QMenu, QAction, QFileDialog, QWidget
+from PyQt5.QtGui import QPixmap, QPainter, QPen, QImage
 from PyQt5.QtCore import Qt, QPoint
+import numpy as np
 
 class ClickableImageLabel(QLabel):
     def __init__(self, parent=None):
@@ -60,3 +61,49 @@ class ClickableImageLabel(QLabel):
             y_img = y_in_pix * self.pixmap_orig.height() / scaled_pix.height()
             self.click_point = (x_img, y_img) # 每次点击覆盖
             self.update_display()
+
+class Window_Label(QLabel):
+    def __init__(self):
+        super().__init__()
+        self.pixmap_item = None
+        self.setAlignment(Qt.AlignCenter)
+
+    def set_image(self, np_image):
+        # 检查是否为灰度图像
+        if len(np_image.shape) != 2:
+            raise ValueError("输入的图像必须为灰度图像（二维数组）")
+        
+        np_image = np_image.astype(np.uint8)  # 转换为 uint8 类型
+        
+        # 获取图像的高度和宽度
+        height, width = np_image.shape
+        
+        # 将 numpy 数组转换为 QImage
+        qimage = QImage(np_image.data, width, height, width, QImage.Format_Grayscale8)
+        
+        # 将 QImage 转换为 QPixmap
+        self.pixmap_item = QPixmap.fromImage(qimage)
+        
+        # 设置 QLabel 显示图像
+        self.setPixmap(self.pixmap_item)
+
+    def contextMenuEvent(self, event):
+        if self.pixmap_item:
+            # 创建右键菜单
+            context_menu = QMenu(self)
+
+            # 添加菜单项：保存图像
+            save_action = QAction("保存图像", self)
+            save_action.triggered.connect(self.save_image)
+
+            context_menu.addAction(save_action)
+            
+            # 执行菜单
+            context_menu.exec_(event.globalPos())
+
+    def save_image(self):
+        # 打开文件保存对话框
+        file_name, _ = QFileDialog.getSaveFileName(self, "保存图像", "", "PNG Files (*.png);;JPEG Files (*.jpg);;All Files (*)")
+        
+        if file_name:
+            self.pixmap_item.save(file_name)

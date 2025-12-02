@@ -62,12 +62,18 @@ class matching_app:
         self.ui.right_img.set_image(self.right_img_path)
 
     def choose_cal(self):
+        if self.ui.left_img.click_point is None or self.ui.right_img.click_point is None:
+            show_info(self.ui, message="请先选择同名点！")
+            return
         matching = Matching(self.left_img_path, self.right_img_path)
         x1, y1 = self.ui.left_img.click_point
         x2, y2 = self.ui.right_img.click_point
         matching.set_params(35)
         matching.set_centers(x1, y1, x2, y2)
+        left_window = matching.get_left_window()
         matching.calculate()
+
+        self.ui.left_window_origin.set_image(left_window)
     
     def run(self):
         sys.exit(self.app.exec_())
