@@ -44,7 +44,7 @@ void matching::disp_windows() //展示影像窗口
     cv::Mat right_win_show;
     cv::normalize(left_window, left_win_show, 0, 1, cv::NORM_MINMAX);
     cv::normalize(right_window, right_win_show, 0, 1, cv::NORM_MINMAX); //影像窗口用了32位浮点数存储，因此在显示时要归一化至0-1之间再显示
-    cv::imshow("Left",left_win_show);
+    //cv::imshow("Left",left_win_show);
     cv::imshow("Right",right_win_show); //展示图像
     cv::waitKey(0);
 }
@@ -158,9 +158,9 @@ void matching::construct_matrices()
     double h1 = X.getMatrix_ele(1,0);
     int pix_counter = 0;
     int k = (int)((window_size-2)/2);
-    for(int i = 0;i<window_size-2; i++)
+    for(int i = 0;i<window_size-2; i++) //x
     {
-        for(int j = 0;j<window_size-2; j++)
+        for(int j = 0;j<window_size-2; j++) //y
         {
             int x = rightx - k + i;
             int y = righty - k + j;
@@ -206,7 +206,7 @@ void matching::update()
     double b0 = X.getMatrix_ele(5,0);
     double b1 = X.getMatrix_ele(6,0);
     double b2 = X.getMatrix_ele(7,0);
-
+    
     double new_h0 = h0 + dh0 + h0*dh1;
     double new_h1 = h1 + h1*dh1;
     double new_a0 = a0 + da0 + a0*da1 + b0*da2;
@@ -215,7 +215,8 @@ void matching::update()
     double new_b0 = b0 + db0 + a0*db1 + b0*db2;
     double new_b1 = b1 + a1*db1 + b1*db2;
     double new_b2 = b2 + a2*db1 + b2*db2;
-
+    
+    
     /*
     double new_h0 = h0 + dh0;
     double new_h1 = h1 + dh1;
@@ -361,6 +362,10 @@ void matching::calculate()
     {
         get_g2();
         radioCorrection();
+        //right_window.convertTo(right_window, CV_32F, 1.0 / 255.0);
+        //cv::Mat img_8u;
+        //right_window.convertTo(img_8u, CV_8U, 255.0);
+        //cv::imwrite(std::to_string(times) + ".jpg", img_8u);
         if(first == 1)
         {
             get_corr();
@@ -399,9 +404,9 @@ void matching::get_result()
     double b1 = X.getMatrix_ele(6,0);
     double b2 = X.getMatrix_ele(7,0);
     double h0 = X.getMatrix_ele(0,0);
-    double h1 = X.getMatrix_ele(1,0);
-    distortion_window = cv::Mat(left_window.size(), CV_32F, cv::Scalar(0.0f));
-    int k = (int)(window_size/2);
+    double h1 = X.getMatrix_ele(1,0); //获取形变改正参数
+    distortion_window = cv::Mat(left_window.size(), CV_32F, cv::Scalar(0.0f)); //初始化新窗口
+    int k = (int)(window_size/2); //窗口大小的一半
     for(int i = -k; i<k+1; i++)
     {
         for(int j = -k; j<k+1;j++)
@@ -414,13 +419,20 @@ void matching::get_result()
             {
                 continue;
             }
-            distortion_window.at<float>(std::round(x2 - rightx + k), std::round(y2 - righty + k)) = sample_img(right_img, x2, y2);
+            distortion_window.at<float>( std::round(y2 - righty + k), std::round(x2 - rightx + k)) = sample_img(right_img, x2, y2); //获取原窗口位置下变形后的窗口内容
         }
     }
+
+    //显示窗口内容
     cv::Mat right_win_show;
     cv::normalize(distortion_window, right_win_show, 0, 1, cv::NORM_MINMAX);
     cv::imshow("Distortion",right_win_show);
     cv::waitKey(0);
+
+    //distortion_window.convertTo(distortion_window, CV_32F, 1.0 / 255.0);
+    //cv::Mat img_8u;
+    //distortion_window.convertTo(distortion_window, CV_8U, 255.0);
+    //cv::imwrite(std::string("dist") + ".jpg", distortion_window);
 }
 
 cv::Mat matching::get_left_window()
