@@ -49,3 +49,17 @@ run
 ```
 python main.py
 ```
+
+### Citation
+If you use this project in your research, please cite:
+```bibtex
+@misc{LSMTang2025,
+  title        = {Least-Square Matching for Image Pairs},
+  author       = {Haojun Tang and Jiahao Zhou},
+  year         = {2025},
+  publisher    = {GitHub},
+  journal      = {GitHub repository},
+  howpublished = {\url{https://github.com/DonaldTrump-coder/LeastSquares_Matching}},
+  note         = {Apache License 2.0}
+}
+```
