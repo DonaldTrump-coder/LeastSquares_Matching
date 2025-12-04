@@ -50,7 +50,7 @@ run
 python main.py
 ```
 
-### Citation
+## Citation
 If you use this project in your research, please cite:
 ```bibtex
 @misc{LSMTang2025,
