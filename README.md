@@ -1,5 +1,11 @@
 # Least-Square Matching for Image Pairs
 
+## About the Project
+### Environment
+![environments.PNG](./resources/environments.png)
+### Structure
+![structure.PNG](./resources/structure.png)
+
 ## Core Algorithm tested in C++
 ### Windows
 **1. Download Release for MinGW-w64**<br>
