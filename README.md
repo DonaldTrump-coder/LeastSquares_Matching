@@ -2,9 +2,10 @@
 
 ## About the Project
 ### Environment
-![environments.PNG](./resources/environments.png)
+<img src="./resources/environments.png" width="55%" />
+
 ### Structure
-![structure.PNG](./resources/structure.png)
+<img src="./resources/structure.png" width="55%" />
 
 ## Core Algorithm tested in C++
 ### Windows
